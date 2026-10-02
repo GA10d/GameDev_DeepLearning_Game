@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "checks": {
+    "nativePlayerImage": true,
+    "oldComparison": true,
+    "slider": true,
+    "restoreNative": true,
+    "annotations": true,
+    "allEightNativeImages": true,
+    "noFakeOldPlacement": true,
+    "keyboardNavigation": true,
+    "sourceStudyLink": true,
+    "noHorizontalOverflow": true,
+    "letterboxAligned": true,
+    "bundledFonts": true,
+    "noScriptErrors": true
+  },
+  "errors": [],
+  "scope": "Authored local screenshot viewer. Native gameplay is verified separately."
+}

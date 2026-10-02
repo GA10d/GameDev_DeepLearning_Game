@@ -1,0 +1,17 @@
+{
+  "version": "0.1.0",
+  "editor": "2022.3.62f1",
+  "target": "Windows x64 Mono",
+  "playableLevels": 17,
+  "campaignNodes": 55,
+  "coreChecks": 58,
+  "nativeSmokePassed": true,
+  "tutorialFlowPassed": true,
+  "pinCallbacksPassed": true,
+  "trainingBackend": "CPU",
+  "trainingSteps": 180,
+  "trainLoss": 7.747717021472442E-09,
+  "heldOutInputs": 3,
+  "executableSha256": "0B62E9914456F6315D2D5799314C3CDCD398BD59F15EA24662C41A356A4E8669",
+  "zipBytes": 28419711
+}

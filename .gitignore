@@ -1,0 +1,22 @@
+# Unity generated state and builds
+UnityGame/Library/
+UnityGame/Temp/
+UnityGame/Obj/
+UnityGame/Logs/
+UnityGame/Builds/
+UnityGame/UserSettings/
+UnityGame/.vs/
+UnityGame/*.csproj
+UnityGame/*.sln
+UnityGame/*.slnx
+UnityGame/*.user
+UnityGame/*.pidb
+UnityGame/*.booproj
+UnityGame/MemoryCaptures/
+UnityGame/Recordings/
+
+# Python/cache
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

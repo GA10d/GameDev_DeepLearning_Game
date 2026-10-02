@@ -1,0 +1,161 @@
+{
+  "passed": true,
+  "checkedFiles": 31,
+  "checks": [
+    {
+      "file": "README.md",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/README.md",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "docs/open-source-game-ui-study.md",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "docs/ui-art-direction-preview.html",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "docs/ui-art-direction-preview-0.2.html",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "docs/ui-design-system.md",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "docs/ui-verification.md",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "design-assets/ui-tokens.json",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "design-assets/research/open-source-ui-source-manifest.json",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/Assets/Scripts/UI/WorkshopUI.cs",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/Assets/Scripts/UI/HardwareUI.cs",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/Assets/Scripts/UI/HardwareUI.cs.meta",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/Assets/Scripts/Game/FoundryGame.cs",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/Assets/Editor/BuildAutomation.cs",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/ProjectSettings/ProjectSettings.asset",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "UnityGame/Builds/Windows-UI-0.3/LearningFoundry_Data/Managed/Assembly-CSharp.dll",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/01-main-menu.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/02-campaign.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/03-workshop.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/04-first-circuit.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/05-inline-failure.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/06-object-inspector.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/07-technical-manual.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/08-placement-preview.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/interaction-smoke.json",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/player-smoke.json",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/player.log",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/preview-verification.json",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/preview-viewer-narrow.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/preview-viewer.png",
+      "exists": true,
+      "same": true
+    },
+    {
+      "file": "verification/ui-0.3/release-verification.json",
+      "exists": true,
+      "same": true
+    }
+  ]
+}

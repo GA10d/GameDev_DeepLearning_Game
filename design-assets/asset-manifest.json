@@ -1,0 +1,37 @@
+{
+  "retrieved": "2026-10-02",
+  "assets": [
+    {
+      "file": "SourceHanSansCN-Regular.otf",
+      "source": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/SubsetOTF/CN/SourceHanSansCN-Regular.otf",
+      "bytes": 8429224,
+      "sha256": "e2bc8a2e7f37474b774fff8db758681ece40bb6947a90d571bce9dd60671a8e4",
+      "license": "SIL OFL 1.1",
+      "modified": false
+    },
+    {
+      "file": "SourceHanSans-LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/release/LICENSE.txt",
+      "bytes": 4463,
+      "sha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+      "license": "SIL OFL 1.1",
+      "modified": false
+    },
+    {
+      "file": "IBMPlexMono-Regular.ttf",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/IBMPlexMono-Regular.ttf",
+      "bytes": 135580,
+      "sha256": "6a3412f058c7d8dfd9170c41e85ade48e5156ecb89356110ca57a0a27734af46",
+      "license": "SIL OFL 1.1",
+      "modified": false
+    },
+    {
+      "file": "IBMPlexMono-OFL.txt",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexmono/OFL.txt",
+      "bytes": 4456,
+      "sha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da",
+      "license": "SIL OFL 1.1",
+      "modified": false
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "version": "0.3.0",
+  "nativePlayer": {
+    "passed": true,
+    "tutorialFlow": true,
+    "pinConnection": true,
+    "inlineFailure": true,
+    "selectionKeepsReadout": true,
+    "dockKeepsCanvas": true,
+    "manualKeepsCanvas": true,
+    "steps": 180,
+    "loss": 7.747717021472442e-09,
+    "ui": "Unity uGUI native player"
+  },
+  "newInteractions": {
+    "passed": true,
+    "takeBeforeInstall": true,
+    "overlapBlocked": true,
+    "cancelledWithoutMutation": true,
+    "installAtPointer": true,
+    "rotaryEditsRealParameter": true,
+    "rotaryUndo": true,
+    "hiddenBoxHasNoShadow": true
+  },
+  "viewer": {
+    "passed": true,
+    "checks": {
+      "nativePlayerImage": true,
+      "oldComparison": true,
+      "slider": true,
+      "restoreNative": true,
+      "annotations": true,
+      "allEightNativeImages": true,
+      "noFakeOldPlacement": true,
+      "keyboardNavigation": true,
+      "sourceStudyLink": true,
+      "noHorizontalOverflow": true,
+      "letterboxAligned": true,
+      "bundledFonts": true,
+      "noScriptErrors": true
+    },
+    "errors": [],
+    "scope": "Authored local screenshot viewer. Native gameplay is verified separately."
+  },
+  "archive": {
+    "name": "LearningFoundry-0.3.0-Windows.zip",
+    "bytes": 35840866,
+    "sha256": "1f9c7d073c270bcf998052377e9a9fed2ffb3d77fb773102c403d47bb300e2dd"
+  },
+  "assemblySha256": "48a14556adc743fd54aef232a296cf0609960c0f2cf08ff462983ba83cfc917e",
+  "gameplayScope": "17 scalar CPU levels, 55 planned campaign nodes; no GPU training or MNIST runtime"
+}

@@ -1,0 +1,65 @@
+{
+  "version": "0.3",
+  "referenceResolution": [
+    1600,
+    900
+  ],
+  "colors": {
+    "Wood": "#52412F",
+    "Mat": "#25342D",
+    "Frame": "#1A2621",
+    "Enamel": "#C7C4A6",
+    "Metal": "#BABFAB",
+    "Paper": "#E3DBBF",
+    "Ink": "#29332B",
+    "Accent": "#B56130",
+    "Phosphor": "#B0DBA3",
+    "Cable": "#ADA866"
+  },
+  "fonts": {
+    "body": "SourceHanSansCN-Regular.otf",
+    "numbers": "IBMPlexMono-Regular.ttf"
+  },
+  "skins": [
+    "raised nine-slice",
+    "recessed nine-slice",
+    "chamfered chip",
+    "circular socket",
+    "rotary dial",
+    "CRT readout"
+  ],
+  "nodeSizes": {
+    "Input": [
+      154,
+      100
+    ],
+    "Constant": [
+      154,
+      100
+    ],
+    "Parameter": [
+      168,
+      124
+    ],
+    "ALU": [
+      148,
+      114
+    ],
+    "Output": [
+      180,
+      116
+    ],
+    "Module": [
+      190,
+      124
+    ]
+  },
+  "placementSnap": 16,
+  "portHitSize": 36,
+  "canvasZoom": [
+    0.45,
+    1.3
+  ],
+  "artwork": "Original procedural Unity graphics; no imported game sprites",
+  "note": "Tokens specify base tint. Bevel, illumination and surface texture change rendered pixels; verify final views."
+}

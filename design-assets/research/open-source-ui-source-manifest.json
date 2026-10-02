@@ -1,0 +1,155 @@
+[
+  {
+    "repo": "Anuken/Mindustry",
+    "commit": "69ed90bb9d130c5f8d06046e940cb7062992a0b7",
+    "path": "core/src/mindustry/ui/Styles.java",
+    "url": "https://github.com/Anuken/Mindustry/blob/69ed90bb9d130c5f8d06046e940cb7062992a0b7/core/src/mindustry/ui/Styles.java",
+    "bytes": 16160,
+    "sha256": "1cc8b4cf43758c9124b839090157fa7b807c076f332d562ceb751dd3dabd1698",
+    "lines": 497
+  },
+  {
+    "repo": "Anuken/Mindustry",
+    "commit": "69ed90bb9d130c5f8d06046e940cb7062992a0b7",
+    "path": "core/src/mindustry/ui/fragments/HudFragment.java",
+    "url": "https://github.com/Anuken/Mindustry/blob/69ed90bb9d130c5f8d06046e940cb7062992a0b7/core/src/mindustry/ui/fragments/HudFragment.java",
+    "bytes": 48098,
+    "sha256": "e7dc36adfc43ccd843077310141f27d5627a3b3bd5b4132b3d3334421da58615",
+    "lines": 1242
+  },
+  {
+    "repo": "Anuken/Mindustry",
+    "commit": "69ed90bb9d130c5f8d06046e940cb7062992a0b7",
+    "path": "core/src/mindustry/ui/fragments/PlacementFragment.java",
+    "url": "https://github.com/Anuken/Mindustry/blob/69ed90bb9d130c5f8d06046e940cb7062992a0b7/core/src/mindustry/ui/fragments/PlacementFragment.java",
+    "bytes": 39227,
+    "sha256": "687aca2771474ad2a8ef4aba0f6c1cc4bff492d58dc60bc75d71963846657957",
+    "lines": 817
+  },
+  {
+    "repo": "tobspr-games/shapez.io",
+    "commit": "8a79de5255fb6756f3a1d26579b1e9bc36e0c811",
+    "path": "src/js/game/hud/hud.js",
+    "url": "https://github.com/tobspr-games/shapez.io/blob/8a79de5255fb6756f3a1d26579b1e9bc36e0c811/src/js/game/hud/hud.js",
+    "bytes": 7580,
+    "sha256": "94fa00258c965523da704563bb6c2895fdca1bd02c6fb5cc29340a6122bc0f25",
+    "lines": 237
+  },
+  {
+    "repo": "tobspr-games/shapez.io",
+    "commit": "8a79de5255fb6756f3a1d26579b1e9bc36e0c811",
+    "path": "src/js/game/hud/parts/base_toolbar.js",
+    "url": "https://github.com/tobspr-games/shapez.io/blob/8a79de5255fb6756f3a1d26579b1e9bc36e0c811/src/js/game/hud/parts/base_toolbar.js",
+    "bytes": 12118,
+    "sha256": "18719a504f787fca9d72a4867bc62fe4ab965c3b294fb879628fb7cb9b36e2ab",
+    "lines": 327
+  },
+  {
+    "repo": "tobspr-games/shapez.io",
+    "commit": "8a79de5255fb6756f3a1d26579b1e9bc36e0c811",
+    "path": "src/js/game/hud/parts/building_placer.js",
+    "url": "https://github.com/tobspr-games/shapez.io/blob/8a79de5255fb6756f3a1d26579b1e9bc36e0c811/src/js/game/hud/parts/building_placer.js",
+    "bytes": 26418,
+    "sha256": "0f7cb6280197abdf296097fcd602e457f07c63f14e4b77ede02b69949ecfb3aa",
+    "lines": 684
+  },
+  {
+    "repo": "tobspr-games/shapez.io",
+    "commit": "8a79de5255fb6756f3a1d26579b1e9bc36e0c811",
+    "path": "src/css/ingame_hud/buildings_toolbar.scss",
+    "url": "https://github.com/tobspr-games/shapez.io/blob/8a79de5255fb6756f3a1d26579b1e9bc36e0c811/src/css/ingame_hud/buildings_toolbar.scss",
+    "bytes": 6094,
+    "sha256": "722a45353de37171726718a626b8e5b14f393c4f5e10f6e0613c3a2e7ae62465",
+    "lines": 185
+  },
+  {
+    "repo": "OpenTTD/OpenTTD",
+    "commit": "f412dc618bc770e535b20d42ed891462be18ef1a",
+    "path": "src/toolbar_gui.cpp",
+    "url": "https://github.com/OpenTTD/OpenTTD/blob/f412dc618bc770e535b20d42ed891462be18ef1a/src/toolbar_gui.cpp",
+    "bytes": 92946,
+    "sha256": "2e723e08b3f723277e89bab4f7b5e21062f44a00f71da899fcc12e4bfde3144c",
+    "lines": 2628
+  },
+  {
+    "repo": "OpenTTD/OpenTTD",
+    "commit": "f412dc618bc770e535b20d42ed891462be18ef1a",
+    "path": "src/widget.cpp",
+    "url": "https://github.com/OpenTTD/OpenTTD/blob/f412dc618bc770e535b20d42ed891462be18ef1a/src/widget.cpp",
+    "bytes": 139083,
+    "sha256": "354848e618ca891ee7d172a410848e64efba820dfbd385cb3566281a5fe9c358",
+    "lines": 3552
+  },
+  {
+    "repo": "OpenTTD/OpenTTD",
+    "commit": "f412dc618bc770e535b20d42ed891462be18ef1a",
+    "path": "src/window.cpp",
+    "url": "https://github.com/OpenTTD/OpenTTD/blob/f412dc618bc770e535b20d42ed891462be18ef1a/src/window.cpp",
+    "bytes": 123105,
+    "sha256": "fa6eb4d17fc25968aa2d94b80607ee9d2fb402dacb75554f3dd2e1baa809a8fc",
+    "lines": 3645
+  },
+  {
+    "repo": "OpenTTD/OpenTTD",
+    "commit": "f412dc618bc770e535b20d42ed891462be18ef1a",
+    "path": "COPYING.md",
+    "url": "https://github.com/OpenTTD/OpenTTD/blob/f412dc618bc770e535b20d42ed891462be18ef1a/COPYING.md",
+    "bytes": 17949,
+    "sha256": "50ac792e113700dd23ecb25ed6f341eb383bed36cb8fd87aa164f4e44f2760b3",
+    "lines": 338
+  },
+  {
+    "repo": "OpenRCT2/OpenRCT2",
+    "commit": "11513222890717e81431c83a28aafb7555f2ccd2",
+    "path": "src/openrct2-ui/interface/Widget.cpp",
+    "url": "https://github.com/OpenRCT2/OpenRCT2/blob/11513222890717e81431c83a28aafb7555f2ccd2/src/openrct2-ui/interface/Widget.cpp",
+    "bytes": 50905,
+    "sha256": "d333ccd49d596e97f36aa5f6513958e008a5197811e948d058a3694ca796a0f4",
+    "lines": 1321
+  },
+  {
+    "repo": "OpenRCT2/OpenRCT2",
+    "commit": "11513222890717e81431c83a28aafb7555f2ccd2",
+    "path": "src/openrct2-ui/windows/TopToolbar.cpp",
+    "url": "https://github.com/OpenRCT2/OpenRCT2/blob/11513222890717e81431c83a28aafb7555f2ccd2/src/openrct2-ui/windows/TopToolbar.cpp",
+    "bytes": 62590,
+    "sha256": "a9bf82700a67cabed20cf707145bb31427af2137b498eb791ee2a0f9478d5b09",
+    "lines": 1476
+  },
+  {
+    "repo": "OpenRA/OpenRA",
+    "commit": "7d57605bca2cbe963068d42505e00072afe19868",
+    "path": "mods/ra/chrome/ingame-player.yaml",
+    "url": "https://github.com/OpenRA/OpenRA/blob/7d57605bca2cbe963068d42505e00072afe19868/mods/ra/chrome/ingame-player.yaml",
+    "bytes": 17537,
+    "sha256": "1dfc70317b5332c3938d76f88f167b2a04eeb3e30ed2f0fc86f1a184af5eb259",
+    "lines": 659
+  },
+  {
+    "repo": "OpenRA/OpenRA",
+    "commit": "7d57605bca2cbe963068d42505e00072afe19868",
+    "path": "mods/ra/chrome.yaml",
+    "url": "https://github.com/OpenRA/OpenRA/blob/7d57605bca2cbe963068d42505e00072afe19868/mods/ra/chrome.yaml",
+    "bytes": 15642,
+    "sha256": "4753d8592f86f91a33a98af2d21414b3afdb99cfc0751f99bfa163b981ecb2df",
+    "lines": 673
+  },
+  {
+    "repo": "OpenRA/OpenRA",
+    "commit": "7d57605bca2cbe963068d42505e00072afe19868",
+    "path": "OpenRA.Game/Graphics/ChromeProvider.cs",
+    "url": "https://github.com/OpenRA/OpenRA/blob/7d57605bca2cbe963068d42505e00072afe19868/OpenRA.Game/Graphics/ChromeProvider.cs",
+    "bytes": 9358,
+    "sha256": "94d83e794a2c211d1e8b6f5ec11e133e127a6adf02c6033c5f5a5c1499b1eef8",
+    "lines": 305
+  },
+  {
+    "repo": "OpenRA/OpenRA",
+    "commit": "7d57605bca2cbe963068d42505e00072afe19868",
+    "path": "OpenRA.Mods.Common/Widgets/WorldInteractionControllerWidget.cs",
+    "url": "https://github.com/OpenRA/OpenRA/blob/7d57605bca2cbe963068d42505e00072afe19868/OpenRA.Mods.Common/Widgets/WorldInteractionControllerWidget.cs",
+    "bytes": 7872,
+    "sha256": "39d70f7893aba0569c1fffa549672b543d8726e6896c9a83d10f2674a37c5d35",
+    "lines": 250
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "background": "Paper",
+  "ratios": {
+    "Ink": 11.26,
+    "Muted": 5.32,
+    "Accent": 4.66,
+    "Signal": 5.41,
+    "Fault": 5.46
+  },
+  "allAtLeast4_5": true,
+  "scope": "Token pairs only; not an accessibility audit of the complete game."
+}

@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "checks": {
+    "nativeScreenshot": true,
+    "compare": true,
+    "annotation": true,
+    "allSevenViews": true,
+    "convShape": true,
+    "eightChannels": true,
+    "reluShape": true,
+    "poolShape": true,
+    "poolPixels": true,
+    "channelSelection": true,
+    "pixelReadout": true,
+    "swatches": true,
+    "narrowNoHorizontalOverflow": true,
+    "fonts": true,
+    "noScriptErrors": true
+  },
+  "errors": [],
+  "scope": "Local authored design preview; no live apps controlled"
+}
