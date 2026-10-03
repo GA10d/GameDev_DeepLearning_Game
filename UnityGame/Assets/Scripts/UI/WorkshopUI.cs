@@ -187,15 +187,17 @@ namespace LearningFoundry.UI
         Vector2 offset;
         public void OnBeginDrag(PointerEventData e)
         {
+            if (e.button != PointerEventData.InputButton.Left) return;
             before?.Invoke(); RectTransformUtility.ScreenPointToLocalPointInRectangle(board, e.position, e.pressEventCamera, out var p); offset = new Vector2(node.x, -node.y) - p;
         }
         public void OnDrag(PointerEventData e)
         {
+            if (e.button != PointerEventData.InputButton.Left) return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(board, e.position, e.pressEventCamera, out var p); p += offset;
             node.x = Mathf.Round(Mathf.Clamp(p.x, 16, board.rect.width - 200) / 16) * 16; node.y = Mathf.Round(Mathf.Clamp(-p.y, 16, board.rect.height - 150) / 16) * 16;
             ((RectTransform)transform).anchoredPosition = new Vector2(node.x, -node.y); changed?.Invoke();
         }
-        public void OnEndDrag(PointerEventData e) { end?.Invoke(); }
+        public void OnEndDrag(PointerEventData e) { if (e.button == PointerEventData.InputButton.Left) end?.Invoke(); }
     }
     public sealed class GraphBoard
     {
@@ -229,7 +231,7 @@ namespace LearningFoundry.UI
             foreach (Transform child in root) UnityEngine.Object.Destroy(child.gameObject);
             Cancel(); readouts.Clear(); lamps.Clear(); knobs.Clear(); plates.Clear(); signalOrder.Clear(); inputSockets.Clear();
             var background = root.GetComponent<Image>() ?? root.gameObject.AddComponent<Image>(); background.color = Color.clear;
-            var input = root.GetComponent<BoardInput>() ?? root.gameObject.AddComponent<BoardInput>(); input.place = PlaceAt; input.cancel = Cancel;
+            var input = root.GetComponent<BoardInput>() ?? root.gameObject.AddComponent<BoardInput>(); input.place = PlaceAt;
             var grid = Style.Rect(root, "Board Registration Marks", 0, 0, root.rect.width, root.rect.height).gameObject.AddComponent<Lines>(); grid.grid = true; grid.raycastTarget = false;
             wires = Style.Rect(root, "Physical Patch Cables", 0, 0, root.rect.width, root.rect.height).gameObject.AddComponent<Lines>(); wires.cables = true; wires.color = new Color(.68f, .66f, .40f); wires.raycastTarget = false;
             foreach (var n in graph.nodes)
@@ -369,7 +371,6 @@ namespace LearningFoundry.UI
         }
         public void TickPointer(Camera camera)
         {
-            if (Input.GetMouseButtonDown(1) && (placing.HasValue || PendingCable)) { Cancel(); status("工具已放下。"); }
             if (!placing.HasValue && !PendingCable) return;
             bool inside = RectTransformUtility.RectangleContainsScreenPoint((RectTransform)root.parent, Input.mousePosition, camera);
             RectTransformUtility.ScreenPointToLocalPointInRectangle(root, Input.mousePosition, camera, out var local);

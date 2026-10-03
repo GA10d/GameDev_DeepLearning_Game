@@ -1,0 +1,16 @@
+{
+  "version": "0.4.0",
+  "date": "2026-10-02",
+  "zip": "LearningFoundry-0.4.0-Windows.zip",
+  "bytes": 35847947,
+  "sha256": "5602f7120c84ffb2fc510ccea0fa17e91b03b301dfe53df82ff5d999988327cd",
+  "assemblySHA256": "ba8d48525ca4140a8c1cd958e8e7c3c8a6d3df914ab3ceea879e477b9c5e0b41",
+  "zipFiles": 132,
+  "zipCRCAndEveryFileMatch": true,
+  "nativeOnboardingChecks": 18,
+  "nativePlayerPassed": true,
+  "nativeInteractionsPassed": true,
+  "nativeOnboardingPassed": true,
+  "viewerPassed": true,
+  "sourceCommitShapez": "8a79de5255fb6756f3a1d26579b1e9bc36e0c811"
+}

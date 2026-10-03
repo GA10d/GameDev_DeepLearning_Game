@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>学习工坊 · Unity 0.4 实际画面</title>
+<style>
+@font-face{font-family:Han;src:url('../design-assets/fonts/SourceHanSansCN-Regular.otf')}
+@font-face{font-family:Plex;src:url('../design-assets/fonts/IBMPlexMono-Regular.ttf')}
+*{box-sizing:border-box}body{margin:0;background:#111a16;color:#e3dbbf;font:15px Han,'Microsoft YaHei',sans-serif;overflow:hidden}
+button,a,input{font:inherit}button,a{color:inherit}button{cursor:pointer;border:1px solid #6a7564;background:#2c382e;padding:7px 12px;min-height:36px}button:hover{background:#485341}button:disabled{opacity:.35;cursor:default}button[aria-pressed=true]{background:#98542e;border-color:#d79b63}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #f4c68b;outline-offset:3px}a{text-underline-offset:4px}
+#frame{position:fixed;inset:0;background:#111a16}#frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}#after{z-index:1}
+#split{position:absolute;z-index:3;border-left:2px solid #f2d7a1;top:0;bottom:0;display:none;pointer-events:none}
+#split span{background:#15201be8;padding:7px 11px;position:absolute;top:95px;right:12px;white-space:nowrap;font:13px Plex,monospace}
+.chrome{position:fixed;z-index:10;transition:opacity .2s;background:#111a16e8;border:1px solid #69735b;box-shadow:0 3px 0 #0006}.chrome:hover,.chrome:focus-within{opacity:1!important}
+#top{left:12px;top:12px;padding:7px 12px;display:flex;align-items:center;gap:14px;font-size:13px}#top strong{font:13px Plex,monospace;font-weight:400}#top small{font-size:12px;color:#b8c4a7}
+#tools{right:12px;top:12px;display:flex;gap:6px;padding:6px;align-items:center}
+#bottom{left:50%;bottom:12px;transform:translateX(-50%);width:max-content;max-width:calc(100vw - 24px);padding:8px 10px}
+#navigation{display:flex;gap:5px;justify-content:center;flex-wrap:wrap}#navigation button{padding:6px 10px;font-size:13px}
+#description{max-width:1000px;padding:5px 8px 0;text-align:center;font-size:13px;color:#c1c9ac}#comparison{display:none;gap:13px;align-items:center;padding:11px 8px 4px;font:12px Plex,monospace}#comparison input{width:100%;accent-color:#cf915e}
+#overlay{position:absolute;inset:0;z-index:4;pointer-events:none}.zone{position:absolute;border:1px dashed #f5bc80;background:#e7ba7a08;pointer-events:auto;cursor:pointer}.zone span{position:absolute;top:2px;left:4px;padding:2px 6px;background:#111a16e8;font-size:12px;white-space:nowrap}.zone:hover{background:#e7ba7a20}
+#hint{position:fixed;top:68px;right:12px;z-index:12;width:min(520px,calc(100vw - 24px));background:#111a16f2;border:1px solid #69735b;padding:15px 18px;line-height:1.8;display:none;font-size:14px}#hint p{margin:0 0 8px}#hint p:last-child{margin:0}#hint .small{font-size:12px;color:#bac5ab}
+body.quiet .chrome{opacity:.12}body.quiet #top{opacity:0}body.quiet #bottom{opacity:.10}
+.hidden{display:none!important}@media(max-width:1000px){#top small{display:none}#tools button{font-size:12px;padding:6px}#description{display:none}#navigation button{font-size:12px;padding:5px 7px}#top{top:auto;bottom:118px;font-size:11px}}
+@media(prefers-reduced-motion:reduce){.chrome{transition:none}}
+</style></head>
+<body>
+<main id="frame" aria-label="实际 Unity 游戏截图"><img id="before" alt="Unity 0.3 对照画面"><img id="after" alt="Unity 0.4 游戏画面"><div id="overlay" class="hidden"></div><div id="split"><span>0.3 ← | → 0.4</span></div></main>
+<div id="top" class="chrome"><strong>LEARNING FOUNDRY / 0.4</strong><small>实际 Unity 画面 · 浏览器仅用于查看</small></div>
+<nav id="tools" class="chrome" aria-label="查看工具"><button id="compare" aria-pressed="false">对照 0.3</button><button id="annotate" aria-pressed="false">标注</button><button id="info" aria-expanded="false">说明与源码</button><a id="native" href="../verification/ui-0.4/09-first-run-route.png" target="_blank" rel="noopener">原图</a></nav>
+<div id="hint"><p>这里展示的是 Unity 玩家程序实际渲染的画面。要操作游戏，请运行 <code>UnityGame/Builds/Windows-UI-0.4/LearningFoundry.exe</code>。</p><p>← / → 切换画面；B 开合旧版对照；H 开合查看工具。拖动对照滑杆，查看布局与部件的变化。</p><p><a href="onboarding-design.md">首次体验设计与调研</a> · <a href="open-source-game-ui-study.md">开源游戏 UI 调研</a> · <a href="ui-design-system.md">界面设计规范</a> · <a href="../verification/ui-0.4/interaction-smoke.json">交互检查</a></p><p class="small">新手截图使用隔离的内存新存档；B09 训练图使用内存中的诊断模型，整理了部件位置，并执行真实 CPU 训练。当前仍为 17 关的可玩原型；GPU、完整 CNN 和手写数字终章尚未实现。</p></div>
+<div id="bottom" class="chrome"><nav id="navigation" aria-label="场景切换"></nav><div id="description" aria-live="polite"></div><div id="comparison"><span>0.4</span><input id="range" type="range" min="0" max="100" value="50" aria-label="新旧界面分界位置"><span>0.3</span></div></div>
+<script>
+const states=[{"id":"route","title":"路线概览","file":"09-first-run-route.png","old":true,"oldFile":"01-main-menu.png","note":"首次打开先讲最终目标、当前阶段与第一动作。0.3 对照为旧版直接进入的主菜单。"},{"id":"observe","title":"首次送样","file":"10-guide-observe.png","old":false,"note":"第一步只提示送入样本，亮框定位真实按钮；成功计算后才推进。"},{"id":"train","title":"开始训练","file":"11-guide-train.png","old":false,"note":"保留真实的训练前预测与目标，指向控制盒中的训练按钮。"},{"id":"learning","title":"观察学习","file":"12-guide-learning.png","old":false,"note":"P00 用约 4.4 秒展示 80 次真实更新；高亮曲线，显示实际步数、平均损失和参数。"},{"id":"compare","title":"同输入对比","file":"13-guide-compare.png","old":false,"note":"训练达标后，送回相同输入，才能比较训练前后预测；使用另一个样本不会完成这一步。"},{"id":"check","title":"验收设备","file":"14-guide-check.png","old":false,"note":"展示真实预测和绝对误差的变化。点击正式验收按钮，解锁 A01。"},{"id":"handoff","title":"下一份委托","file":"15-first-handoff.png","old":false,"note":"完成时说明下一关从最简单的接线开始，让体验训练与从部件搭建形成连贯路线。"},{"id":"workshop","title":"装配训练","file":"03-workshop.png","old":true,"note":"工作台、托盘、控制盒和示波器各有用途；B09 使用真实训练的诊断模型。"},{"id":"connect","title":"插接线路","file":"04-first-circuit.png","old":true,"note":"左侧输入、右侧监测器；实际源与目标插孔回调完成接线。"},{"id":"place","title":"拿取零件","file":"08-placement-preview.png","old":true,"note":"拿取时显示预览，在空位安装；重叠拒绝，右键或 Esc 放回。"},{"id":"calibrate","title":"部件校准","file":"06-object-inspector.png","old":true,"note":"拖动旋钮调参、Shift 微调；控制盒提供精确数值，保留测量记录。"},{"id":"map","title":"委托路线","file":"02-campaign.png","old":true,"note":"接线板列出各关知识点、状态与前置条件，未来章节标为规划。"},{"id":"manual","title":"夹板手册","file":"07-technical-manual.png","old":true,"note":"手册提供当前关卡教学，并新增学习路线和操作重看入口。"},{"id":"failure","title":"现场诊断","file":"05-inline-failure.png","old":true,"note":"失败显示在仪表和记录纸上，可立即继续修理。"},{"id":"menu","title":"开工","file":"01-main-menu.png","old":true,"note":"主菜单常驻学习路线入口；路线仅首次自动展示，可以跳过和重看。"}];
+const zones=[
+[1.5,2.55,48.375,7.89,'设备铭牌','本关名称和知识点仍常驻。'],
+[2.25,13.89,95.5,68.55,'装配现场','安装、接线、移动部件；收起器材不重新布局。'],
+[1.5,85.55,43.625,12,'零件托盘','只出现本关可用部件；数字键与部件图标对应。'],
+[46.25,85.55,52.25,12,'控制台','送样、验收、撤销与器材开合。'],
+[22.88,64.33,53.75,17.56,'移动示波器','真实输出、损失曲线、参数记录；可移动和收起。'],
+[77.875,34.88,18.375,48.66,'移动控制盒','训练、快照或选中部件的精确校准。']];
+const $=id=>document.getElementById(id);let index=0,comparing=false,annotated=false,quietTimer;
+function wake(){document.body.classList.remove('quiet');clearTimeout(quietTimer);if(!$('hint').offsetHeight)quietTimer=setTimeout(()=>document.body.classList.add('quiet'),3000)}
+function layout(){const w=Math.min(innerWidth,innerHeight*16/9),h=w*9/16,x=(innerWidth-w)/2,y=(innerHeight-h)/2;for(const id of ['before','after','overlay']){$(id).style.left=x+'px';$(id).style.top=y+'px';$(id).style.width=w+'px';$(id).style.height=h+'px';$(id).style.right='auto';$(id).style.bottom='auto'}return{x,y,w,h}}
+function updateComparison(){const area=layout();const value=comparing?+$('range').value:0;$('after').style.clipPath=`inset(0 0 0 ${value}%)`;$('split').style.display=comparing?'block':'none';$('split').style.left=(area.x+area.w*value/100)+'px';$('split').style.top=area.y+'px';$('split').style.bottom='auto';$('split').style.height=area.h+'px';$('comparison').style.display=comparing?'flex':'none';$('compare').setAttribute('aria-pressed',String(comparing));$('overlay').classList.toggle('hidden',!annotated||comparing||!['workshop','calibrate'].includes(states[index].id))}
+function show(i){index=(i+states.length)%states.length;const s=states[index];$('after').src='../verification/ui-0.4/'+s.file;$('after').alt='Unity 0.4 · '+s.title;$('before').src=s.old?'../verification/ui-0.3/'+(s.oldFile||s.file):$('after').src;$('native').href=$('after').src;$('description').textContent=s.note;$('compare').disabled=!s.old;comparing=false;[...$('navigation').children].forEach((b,n)=>b.setAttribute('aria-pressed',String(n===index)));updateComparison();wake()}
+states.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.title;b.addEventListener('click',()=>show(i));$('navigation').append(b)});
+zones.forEach(([x,y,w,h,title,note])=>{const b=document.createElement('div');b.className='zone';b.style.cssText=`left:${x}%;top:${y}%;width:${w}%;height:${h}%`;const span=document.createElement('span');span.textContent=title;b.append(span);b.title=note;b.addEventListener('click',()=>{$('description').textContent=note;wake()});$('overlay').append(b)});
+$('compare').addEventListener('click',()=>{comparing=!comparing;updateComparison();wake()});$('range').addEventListener('input',updateComparison);
+$('annotate').addEventListener('click',()=>{annotated=!annotated;$('annotate').setAttribute('aria-pressed',String(annotated));updateComparison();wake()});
+$('info').addEventListener('click',()=>{const open=$('hint').offsetHeight>0;$('hint').style.display=open?'none':'block';$('info').setAttribute('aria-expanded',String(!open));wake()});
+document.addEventListener('pointermove',wake);document.addEventListener('focusin',wake);
+document.addEventListener('keydown',e=>{if(e.target instanceof HTMLInputElement)return;if(e.key==='ArrowRight'){e.preventDefault();show(index+1)}if(e.key==='ArrowLeft'){e.preventDefault();show(index-1)}if(e.key.toLowerCase()==='b'&&!$('compare').disabled)$('compare').click();if(e.key.toLowerCase()==='h'){clearTimeout(quietTimer);document.body.classList.toggle('quiet')}});
+window.addEventListener('resize',updateComparison);show(0);
+</script></body></html>

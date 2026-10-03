@@ -15,7 +15,7 @@ namespace LearningFoundry.Editor
         {
             PlayerSettings.companyName = "DeepLearningWorkshop";
             PlayerSettings.productName = "Learning Foundry";
-            PlayerSettings.bundleVersion = "0.3.0";
+            PlayerSettings.bundleVersion = "0.5.0";
             PlayerSettings.defaultScreenWidth = 1600;
             PlayerSettings.defaultScreenHeight = 900;
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;

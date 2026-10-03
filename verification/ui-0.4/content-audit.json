@@ -1,0 +1,10 @@
+{
+  "levels": 55,
+  "required": 47,
+  "optional": 8,
+  "modules": 69,
+  "missing_introductions": 0,
+  "inaccessible_modules": 0,
+  "visualization_specs": 55,
+  "map_data_matches": true
+}

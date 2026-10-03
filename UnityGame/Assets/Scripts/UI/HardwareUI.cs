@@ -175,14 +175,14 @@ namespace LearningFoundry.UI
     {
         public GraphNode node; public Action before, changed, end; public HardwareGraphic graphic;
         public bool locked;
-        public void OnBeginDrag(PointerEventData e) { if (!locked) before?.Invoke(); }
+        public void OnBeginDrag(PointerEventData e) { if (e.button == PointerEventData.InputButton.Left && !locked) before?.Invoke(); }
         public void OnDrag(PointerEventData e)
         {
-            if (locked) return;
+            if (locked || e.button != PointerEventData.InputButton.Left) return;
             node.value += e.delta.y * (Input.GetKey(KeyCode.LeftShift) ? .0025 : .025);
             graphic.dialValue = (float)node.value; graphic.Refresh(); changed?.Invoke();
         }
-        public void OnEndDrag(PointerEventData e) { if (!locked) end?.Invoke(); }
+        public void OnEndDrag(PointerEventData e) { if (e.button == PointerEventData.InputButton.Left && !locked) end?.Invoke(); }
     }
     public sealed class PanelDrag : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
@@ -190,11 +190,13 @@ namespace LearningFoundry.UI
         Vector2 offset;
         public void OnBeginDrag(PointerEventData e)
         {
+            if (e.button != PointerEventData.InputButton.Left) return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)panel.parent, e.position, e.pressEventCamera, out var p);
             offset = panel.anchoredPosition - p; panel.SetAsLastSibling();
         }
         public void OnDrag(PointerEventData e)
         {
+            if (e.button != PointerEventData.InputButton.Left) return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)panel.parent, e.position, e.pressEventCamera, out var p);
             var size = ((RectTransform)panel.parent).rect.size;
             panel.anchoredPosition = new Vector2(Mathf.Clamp(p.x + offset.x, 8, size.x - panel.rect.width - 8), Mathf.Clamp(p.y + offset.y, -size.y + panel.rect.height + 8, -8));
@@ -202,10 +204,9 @@ namespace LearningFoundry.UI
     }
     public sealed class BoardInput : MonoBehaviour, IPointerClickHandler
     {
-        public Action<Vector2> place; public Action cancel;
+        public Action<Vector2> place;
         public void OnPointerClick(PointerEventData e)
         {
-            if (e.button == PointerEventData.InputButton.Right) { cancel?.Invoke(); return; }
             if (e.button != PointerEventData.InputButton.Left) return;
             RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)transform, e.position, e.pressEventCamera, out var p);
             place?.Invoke(new Vector2(p.x, -p.y));

@@ -26,8 +26,12 @@ namespace LearningFoundry.Core
         public List<ModuleSpec> modules = new List<ModuleSpec>();
         public GraphSpec addRule, multiplyRule, optimizer, average;
         public GraphSpec snapshotB09;
+        public List<LabWorkspace> labs = new List<LabWorkspace>();
         public string[] phases = { "update", "backward", "clear", "forward" };
         public bool reverseOrder, accumulate, reduceMotion;
+        // Additive fields: v0.3 saves keep their circuits and progress.
+        public int onboardingVersion;
+        public bool p00GuideHidden;
         public string currentLevel = "P00";
         public float volume = .25f;
         public GraphSpec Graph(string id)
@@ -51,6 +55,8 @@ namespace LearningFoundry.Core
                 var result = JsonUtility.FromJson<Profile>(File.ReadAllText(PathName));
                 if (result == null || result.schema != 1 || result.workspaces == null || result.modules == null || result.completed == null)
                     throw new InvalidDataException("存档格式不能读取。");
+                if(result.labs == null) result.labs = new List<LabWorkspace>();
+                foreach(var w in result.labs) { if(w.layers==null)w.layers=new List<LayerSpec>(); if(w.records==null)w.records=new List<ModelRecord>(); if(w.observed==null)w.observed=new List<int>(); if(w.signatures==null)w.signatures=new List<string>(); if(w.personal==null)w.personal=new List<DrawSample>(); if(w.drawing==null||w.drawing.Length!=784)w.drawing=new float[784]; }
                 return result;
             }
             catch (Exception e)
@@ -162,7 +168,7 @@ namespace LearningFoundry.Core
     }
     public static class Missions
     {
-        public static readonly string[] Implemented = { "P00", "A01", "A02", "A03", "A04", "A05", "A06", "A07", "B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09" };
+        public static readonly string[] Implemented = new[] { "P00", "A01", "A02", "A03", "A04", "A05", "A06", "A07", "B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09" }.Concat(LabMissions.Ids).ToArray();
         public static List<Sample> Samples(bool heldOut = false)
         {
             var coordinates = heldOut ? new[] { new[] { .4, -.8 }, new[] { 1.3, .2 }, new[] { -.6, .7 } } : new[] { new[] { -1.0, -.5 }, new[] { 0.0, 1.0 }, new[] { 1.0, -1.0 }, new[] { .5, .5 } };
@@ -265,7 +271,8 @@ namespace LearningFoundry.Core
                     }
                 }
                 if (id == "B09") result.passed &= CheckRule(profile.addRule, false).passed && CheckRule(profile.multiplyRule, true).passed && CheckOptimizer(profile.optimizer).passed;
-                result.message = result.passed ? "全部校准样本与新输入通过。" : "存在未达标的输出。检查线路与参数；表格右侧是目标值。"; return result;
+                result.message = result.passed ? "全部校准样本与新输入通过。" : "存在未达标的输出。检查线路与参数；表格右侧是目标值。";
+                return result;
             }
             catch (Exception e) { return CheckResult.Fail(e.Message); }
         }

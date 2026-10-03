@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-02",
+  "purpose": "read-only tutorial research; no third-party source or assets incorporated",
+  "factorio": [
+    "https://www.factorio.com/blog/post/fff-342",
+    "https://www.factorio.com/blog/post/fff-261",
+    "https://www.factorio.com/blog/post/fff-361"
+  ],
+  "shapezCommit": "8a79de5255fb6756f3a1d26579b1e9bc36e0c811",
+  "files": [
+    {
+      "path": "src/js/game/hud/parts/interactive_tutorial.js",
+      "sha256": "b58baf13483511efa42f043a45f3948ed1f9ec6b61b0e32d1a683c7d6c2ad501",
+      "url": "https://github.com/tobspr-games/shapez.io/blob/8a79de5255fb6756f3a1d26579b1e9bc36e0c811/src/js/game/hud/parts/interactive_tutorial.js"
+    },
+    {
+      "path": "src/js/game/hud/parts/tutorial_hints.js",
+      "sha256": "f0c9ba26ffbca8ded1a7bf5fb48a2abed79daabd47b14984a54ea57ebbd2b502",
+      "url": "https://github.com/tobspr-games/shapez.io/blob/8a79de5255fb6756f3a1d26579b1e9bc36e0c811/src/js/game/hud/parts/tutorial_hints.js"
+    }
+  ]
+}

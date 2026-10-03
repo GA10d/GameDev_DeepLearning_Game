@@ -1,0 +1,5 @@
+MNIST handwritten digit database
+Authors: Yann LeCun, Corinna Cortes, Christopher J. C. Burges
+Original: https://yann.lecun.org/exdb/mnist/index.html
+Mirror and original-file MD5 checks: https://github.com/pytorch/vision/blob/main/torchvision/datasets/mnist.py
+The four original gzip IDX files are bundled unchanged. The game selects subsets by original IDX IDs; validation and test are disjoint from training. Commercial release rights review remains on the production checklist; no license is inferred from the download mirror.

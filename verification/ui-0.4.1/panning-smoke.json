@@ -1,0 +1,20 @@
+{
+    "passed": true,
+    "backgroundMovesBothAxes": true,
+    "freePastOriginalBounds": true,
+    "releaseStopsImmediately": true,
+    "overNodeMovesViewNotPart": true,
+    "overKnobKeepsParameterAndUndo": true,
+    "zoomKeepsHandSpeed": true,
+    "floatingControlsKeepTheirPlace": true,
+    "pressOutsideCannotCapture": true,
+    "modalBlocksPanning": true,
+    "interruptionStopsCapture": true,
+    "panKeepsPartInHand": true,
+    "rightClickStillPutsPartBack": true,
+    "panKeepsCableInHand": true,
+    "rightClickStillPutsCableBack": true,
+    "wheelStillMovesView": true,
+    "leftBlankDragStillWorks": true,
+    "noModelOrUndoMutation": true
+}

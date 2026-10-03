@@ -1,0 +1,12 @@
+{
+  "version": "0.5.0",
+  "playable": 55,
+  "newLevels": 38,
+  "scalarChecks": 96,
+  "expansionChecks": 149,
+  "nativePlayerPassed": true,
+  "bytes": 46722237,
+  "zipFiles": 133,
+  "sha256": "df3a22be5306f7a3ae61546abebe3efb2c818ea2869a45038ceb9e20aa4fbe4c",
+  "zipCrcAndContents": true
+}

@@ -1,0 +1,10 @@
+{
+    "passed": true,
+    "takeBeforeInstall": true,
+    "overlapBlocked": true,
+    "cancelledWithoutMutation": true,
+    "installAtPointer": true,
+    "rotaryEditsRealParameter": true,
+    "rotaryUndo": true,
+    "hiddenBoxHasNoShadow": true
+}

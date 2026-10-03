@@ -18,7 +18,7 @@ namespace LearningFoundry.Editor
             checks.Clear(); var profile = new Profile { addRule = Recipes.Rule(false), multiplyRule = Recipes.Rule(true), optimizer = Recipes.Optimizer(), average = Recipes.Average(), reverseOrder = true, accumulate = true };
             var campaign = JsonUtility.FromJson<Campaign>(Resources.Load<TextAsset>("Campaign/levels").text);
             Require(campaign.levels.Length == 55, "55 campaign nodes loaded");
-            Require(Missions.Implemented.Length == 17, "17 playable levels registered");
+            Require(Missions.Implemented.Length == 55, "55 playable levels registered");
             Require(campaign.levels.Select(l => l.id).Distinct().Count() == 55, "campaign ids unique");
             foreach (var id in Missions.Implemented)
                 Require(campaign.levels.First(l => l.id == id).deps.All(Missions.Implemented.Contains), id + " prerequisites implemented");

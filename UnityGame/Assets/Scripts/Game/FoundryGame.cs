@@ -12,7 +12,7 @@ using UnityEngine.EventSystems;
 
 namespace LearningFoundry.Game
 {
-    public sealed class FoundryGame : MonoBehaviour
+    public sealed partial class FoundryGame : MonoBehaviour
     {
         Campaign campaign; Profile profile; Canvas canvas; Camera uiCamera; RectTransform screen, inspector, boardRoot, meterDock, boardViewport, mapDetails, activeOverlay; GraphBoard board;
         Text status, instrument, resultTable, stageReadout; TracePlot plot;
@@ -23,6 +23,7 @@ namespace LearningFoundry.Game
         int sampleIndex, probeState, trainingBudget = 240; double eta = .1, epsilon = .01, estimate, quadraticW = -2;
         string message; bool smoke;
         float boardZoom = .8f; bool debugOpen; string mapChapter = "A";
+        WorkbenchPan boardPan;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot()
@@ -44,25 +45,27 @@ namespace LearningFoundry.Game
             if (!FindObjectOfType<EventSystem>()) { var es = new GameObject("Event System", typeof(EventSystem), typeof(StandaloneInputModule)); DontDestroyOnLoad(es); }
             if (!FindObjectOfType<AudioListener>() && Camera.main) Camera.main.gameObject.AddComponent<AudioListener>();
             MainMenu();
-            if (smoke) StartCoroutine(SmokeCapture());
+            if (smoke) StartCoroutine(Environment.GetCommandLineArgs().Contains("--campaign-smoke") ? CampaignSmoke() : SmokeCapture());
         }
         void Update()
         {
             if (board != null) board.Pulse(Time.unscaledTime, profile.reduceMotion);
+            if (boardPan) boardPan.Tick(uiCamera, activeOverlay);
             if (board != null && !activeOverlay) board.TickPointer(uiCamera);
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                if (activeOverlay) { Destroy(activeOverlay.gameObject); activeOverlay = null; }
-                else { if (board != null) board.Cancel(); running = false; if (level != null) SetStatus("线路选择已取消，训练已暂停。工作台会自动保存。"); }
+                if (roadmapOpen) FinishRoadmap(false);
+                else if (activeOverlay) CloseCurrentOverlay();
+                else { if (board != null) board.Cancel(); running = false; labRunning = false; if (level != null) SetStatus("线路选择已取消，训练已暂停。工作台会自动保存。"); }
             }
             var focus = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
             bool editingText = activeOverlay || (focus && focus.GetComponent<InputField>() && focus.GetComponent<InputField>().isFocused);
             if (!editingText && level != null && Input.GetKeyDown(KeyCode.F1)) Notebook();
-            if (!editingText && level != null && Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z)) Undo(false);
-            if (!editingText && level != null && Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y)) Undo(true);
+            if (!editingText && level != null && Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Z)) { if(lab!=null)LabUndo();else Undo(false); }
+            if (!editingText && lab==null && level != null && Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Y)) Undo(true);
             if (!editingText && board != null)
             {
-                if (Input.GetKeyDown(KeyCode.Space)) Observe();
+                if (Input.GetKeyDown(KeyCode.Space)) ObserveButton();
                 if (Input.GetKeyDown(KeyCode.Tab)) { selected = null; Instruments(); inspector.gameObject.SetActive(!inspector.gameObject.activeSelf); }
                 var available = Missions.Palette(averageTab ? "A07" : level.id).ToArray();
                 for (int i = 0; i < available.Length && i < 4; i++) if ((!ReadOnly || averageTab) && Input.GetKeyDown((KeyCode)((int)KeyCode.Alpha1 + i))) AddNode(available[i]);
@@ -72,15 +75,22 @@ namespace LearningFoundry.Game
                 try
                 {
                     int batch = profile.reduceMotion ? 6 : 2;
+                    if (level.id == "P00")
+                    {
+                        trainingClock += Time.unscaledDeltaTime;
+                        batch = Mathf.Min(4, Mathf.FloorToInt(trainingClock / .055f));
+                        trainingClock -= batch * .055f;
+                    }
                     for (int i = 0; i < batch && training.step < trainingBudget; i++) { training.Tick(); trace.Add(training.loss); }
                     UpdateTrainingUI();
                     if (training.step >= trainingBudget) { running = false; Save(); SetStatus("训练预算已用完。可检查新输入，或继续增加 120 步。 "); }
                 }
                 catch (Exception e) { running = false; SetStatus("训练停止：" + e.Message); }
             }
+            RefreshGuide(); TickLab();
         }
         void OnApplicationQuit() { if (profile != null && !smoke) Save(); }
-        void OnApplicationFocus(bool focus) { if (!focus && profile != null && !smoke) Save(); }
+        void OnApplicationFocus(bool focus) { if (!focus && boardPan) boardPan.CancelGesture(); if (!focus && profile != null && !smoke) Save(); }
         void Save()
         {
             if (smoke) return;
@@ -89,6 +99,9 @@ namespace LearningFoundry.Game
         }
         void BaseScreen()
         {
+            labRunning = false; labParts = labCabinet = labReadouts = labTask = labConsole = null; labSummary = labProbe = null; labTrainPlot = labValPlot = null;
+            if (boardPan) boardPan.CancelGesture(); boardPan = null;
+            ClearGuide(); CloseCurrentOverlay();
             running = false; training = null; selected = null; board = null;
             if (screen) Destroy(screen.gameObject);
             screen = Style.Rect(canvas.transform, "Game Screen", 0, 0, 1600, 900);
@@ -98,7 +111,7 @@ namespace LearningFoundry.Game
         }
         public void MainMenu()
         {
-            level = null; BaseScreen();
+            level = null; lab = null; BaseScreen();
             var sign = Hardware.Plate(screen, "Foundry Sign", 46, 28, 1022, 128, Style.Frame);
             Style.Number(sign.transform, "LEARNING FOUNDRY / BENCH 01", 31, 16, 900, 30, 16, Hardware.Phosphor);
             Style.Text(sign.transform, "学习工坊", 29, 44, 390, 70, 45, Style.Paper);
@@ -128,13 +141,14 @@ namespace LearningFoundry.Game
             Style.Text(record.transform, current.concept, 18, 105, 357, 35, 17, Style.Muted);
             Style.Button(power.transform, profile.completed.Count > 0 ? "继续装配  →" : "接受第一份委托  →", 25, 276, 393, 76, () => OpenLevel(profile.currentLevel), Style.Brass);
             Style.Button(power.transform, "委托路线", 25, 380, 393, 56, Map);
-            Style.Button(power.transform, "操作手册", 25, 454, 393, 56, Controls);
+            Style.Button(power.transform, "学习路线 / 新手指引", 25, 454, 393, 56, ShowRoadmap);
             Style.Button(power.transform, "设置", 25, 566, 187, 45, Settings);
             Style.Button(power.transform, "退出", 232, 566, 186, 45, () => Application.Quit());
-            Style.Number(power.transform, "REPAIRED  " + profile.completed.Count + " / 17", 27, 658, 360, 35, 19);
-            Style.Text(screen, "可玩原型 0.3.0 · 17 关 / 后续章节规划中", 48, 816, 715, 35, 17, Style.Paper);
+            Style.Number(power.transform, "REPAIRED  " + profile.completed.Count + " / 55", 27, 658, 360, 35, 19);
+            Style.Text(screen, "可玩原型 0.5.0 · 55 关 / 完整学习路线", 48, 816, 715, 35, 17, Style.Paper);
             Style.Text(screen, "自动存档  /  本机 CPU 训练", 1114, 816, 436, 35, 17, Style.Paper, TextAnchor.MiddleRight);
-            if (!string.IsNullOrEmpty(ProfileStore.LoadWarning)) Modal("存档说明", ProfileStore.LoadWarning, "返回工坊", () => { });
+            if (!string.IsNullOrEmpty(ProfileStore.LoadWarning)) Modal("存档说明", ProfileStore.LoadWarning, "返回工坊", MaybeShowRoadmap);
+            else MaybeShowRoadmap();
         }
 
         void Header(string title, string sub)
@@ -159,7 +173,7 @@ namespace LearningFoundry.Game
         bool Unlocked(Level l) { return Missions.Implemented.Contains(l.id) && (l.deps ?? new string[0]).All(profile.completed.Contains); }
         public void Map()
         {
-            level = null; BaseScreen(); Header("工坊委托板", "章节线路通向更完整的学习机器。点亮的接点可以进入。");
+            level = null; lab = null; BaseScreen(); Header("工坊委托板", "章节线路通向更完整的学习机器。点亮的接点可以进入。");
             float cx = 24;
             foreach (var item in campaign.chapters)
             {
@@ -221,11 +235,13 @@ namespace LearningFoundry.Game
         {
             var target = campaign.levels.FirstOrDefault(l => l.id == id) ?? campaign.levels.First(l => l.id == "P00");
             if (!Unlocked(target) && !profile.completed.Contains(target.id)) { Map(); return; }
-            level = target; profile.currentLevel = target.id; graph = profile.Graph(target.id);
+            if (LabMissions.Ids.Contains(target.id)) { OpenLab(target); return; }
+            lab = null; level = target; profile.currentLevel = target.id; graph = profile.Graph(target.id);
             averageTab = target.id == "A07" && !Missions.CheckAverage(profile.average).passed;
             if (averageTab && profile.average == null) profile.average = Recipes.Empty(new[] { "L1", "L2", "L3", "L4" }, "mean");
             undo.Clear(); redo.Clear(); trace.Clear(); beforeObserved = afterObserved = false; probeRecorded.Clear(); probeState = 0; sampleIndex = 0; unstableObserved = stableObserved = false; eta = .1; trainingBudget = 240;
-            mapChapter = level.chapter; debugOpen = ReadOnly || level.id == "B09"; BuildWorkshop(); Save();
+            eta = level.id == "P00" ? .2 : .1; trainingBudget = level.id == "P00" ? 80 : 240; ResetGuideSession();
+            mapChapter = level.chapter; debugOpen = ReadOnly || level.id == "B09"; BuildWorkshop(); RefreshGuide(); Save();
         }
         GraphSpec ActiveGraph { get { return averageTab ? profile.average : graph; } }
         bool ReadOnly { get { return new[] { "P00", "B01", "B04", "B05", "B07", "B08" }.Contains(level.id); } }
@@ -237,8 +253,14 @@ namespace LearningFoundry.Game
             float contentH = Mathf.Max(1100, ActiveGraph.nodes.Count == 0 ? 1100 : ActiveGraph.nodes.Max(n => n.y) + 250);
             var scroller = Style.Scroll(screen, 36, 125, 1528, 617, contentW, contentH, out boardRoot);
             boardViewport = (RectTransform)scroller.transform;
+            scroller.movementType = ScrollRect.MovementType.Unrestricted; scroller.inertia = false;
+            // A bounded scrollbar can feed clamped positions back into an unrestricted canvas.
+            var boundedBar = scroller.verticalScrollbar; scroller.verticalScrollbar = null;
+            if (boundedBar) boundedBar.gameObject.SetActive(false);
             scroller.horizontalNormalizedPosition = 0; scroller.verticalNormalizedPosition = 1; boardRoot.localScale = Vector3.one * boardZoom;
             board = new GraphBoard(boardRoot, ActiveGraph, profile.modules, ReadOnly && !averageTab, BeforeEdit, Edited, Select, SetStatus, n => { Edited(); Observe(); });
+            boardPan = scroller.gameObject.AddComponent<WorkbenchPan>(); boardPan.scroll = scroller;
+            boardPan.rightClick = () => { if (board.Placing || board.PendingCable) { board.Cancel(); SetStatus("工具已放下。按住右键拖动可平移工作台。"); } };
             Style.Button(screen, "−", 1430, 689, 36, 34, () => { boardZoom = Mathf.Max(.45f, boardZoom - .1f); boardRoot.localScale = Vector3.one * boardZoom; });
             Style.Button(screen, "+", 1473, 689, 36, 34, () => { boardZoom = Mathf.Min(1.3f, boardZoom + .1f); boardRoot.localScale = Vector3.one * boardZoom; });
             Style.Button(screen, "全图", 1516, 689, 44, 34, () => {
@@ -251,7 +273,7 @@ namespace LearningFoundry.Game
             meterDock = Hardware.Plate(screen, "Portable Oscilloscope", 680, 579, 860, 158, Hardware.Metal).rectTransform;
             Instruments(); SetDebugOpen(debugOpen); inspector.gameObject.SetActive(ReadOnly || level.id == "B09");
             var console = Hardware.Plate(screen, "Control Console", 740, 770, 836, 108, Hardware.Metal);
-            Style.Button(console.transform, "送入样本", 14, 16, 139, 70, Observe);
+            Style.Button(console.transform, "送入样本", 14, 16, 139, 70, ObserveButton);
             Style.Button(console.transform, "下一样本", 163, 16, 123, 70, () => { sampleIndex++; Observe(); });
             Style.Button(console.transform, "验收设备", 300, 16, 147, 70, Check, Style.Brass);
             Style.Button(console.transform, "控制盒 / Tab", 469, 13, 170, 34, () => { selected = null; Instruments(); inspector.gameObject.SetActive(!inspector.gameObject.activeSelf); });
@@ -259,8 +281,8 @@ namespace LearningFoundry.Game
             Style.Button(console.transform, "撤销", 469, 57, 105, 34, () => Undo(false));
             Style.Button(console.transform, "重置", 585, 57, 105, 34, ConfirmReset);
             Style.Button(console.transform, "知识 / F1", 701, 57, 119, 34, Notebook);
-            status = Style.Text(screen, "拿取零件后在空位安装。接线从右侧插孔到左侧插孔；旋钮可上下拖动调参。", 27, 881, 1546, 24, 14, Style.Paper);
-            if (level.id == "P00") SetStatus("先送入样本观察，再在控制盒启动训练。Space 送入样本；Tab 开合控制盒。");
+            status = Style.Text(screen, "按住右键拖动平移工作台。右键单击放下工具；左键安装或接线，拖动旋钮调参。", 27, 881, 1546, 24, 14, Style.Paper);
+            if (level.id == "P00") SetStatus("先送入样本观察，再在控制盒启动训练。按住右键拖动平移；Space 送样，Tab 开合控制盒。");
         }
 
         void SetDebugOpen(bool open)
@@ -284,7 +306,8 @@ namespace LearningFoundry.Game
                 Style.Text(content, entry[1], 14, y, 774, height, 20); y += height + 25;
             }
             content.sizeDelta = new Vector2(812, Mathf.Max(542, y));
-            Style.Button(page.transform, "回到装配", 565, 712, 281, 44, () => Destroy(overlay.gameObject), Style.Brass);
+            Style.Button(page.transform, "学习路线 / 新手指引", 32, 712, 340, 44, ShowRoadmap);
+            Style.Button(page.transform, "回到装配", 565, 712, 281, 44, CloseCurrentOverlay, Style.Brass);
         }
         static void Note(Transform parent, string title, string body, ref float y)
         {
@@ -312,6 +335,7 @@ namespace LearningFoundry.Game
         }
         string Instructions()
         {
+            if (lab != null) return LabMissions.Objective(level.id);
             if (averageTab) return "四个输入 L1～L4 表示四件样本的误差。用加法器相加，再乘常量 0.25。验收通过后切换到模型装配。";
             if (level.id == "A06") return "点击‘封装 A04’，再放置两个盒子。将 x、z 接到每个盒子，输出接 yA、yB；点击盒子可分别调内部参数。";
             if (level.id == "B01") return "右侧切换三个旋钮状态。查看原损失、加 epsilon 后的损失；计算每单位位移的变化，填入你的估计并记录。";
@@ -323,6 +347,7 @@ namespace LearningFoundry.Game
         }
         string Specification()
         {
+            if (lab != null) return LabMissions.Objective(level.id);
             switch (level.id)
             {
                 case "A01": return "输出 y = x。全部正数、负数、零与新输入都正确。";
@@ -538,8 +563,10 @@ namespace LearningFoundry.Game
                 {
                     double value = e.Output("loss");
                     if (level.id == "A07" && !averageTab) value = AverageLoss();
-                    plot.series = level.id == "A07" && !averageTab ? "平均损失" : "损失";
-                    trace.Add(value); if (trace.Count > 300) trace.RemoveAt(0); plot.Set(trace);
+                    bool keepTrainingTrace = level.id == "P00" && training != null;
+                    plot.series = keepTrainingTrace ? "训练平均损失" : level.id == "A07" && !averageTab ? "平均损失" : "损失";
+                    if (!keepTrainingTrace) { trace.Add(value); if (trace.Count > 300) trace.RemoveAt(0); }
+                    plot.Set(trace);
                     if (level.id == "A07") instrument.text += "\n四件平均 " + value.ToString("0.####");
                 }
                 else
@@ -548,7 +575,7 @@ namespace LearningFoundry.Game
                     if (gradients && e.parameters.Count > 0) { var parameter = e.parameters.Values.First(); value = parameter.gradient; plot.series = "梯度 " + parameter.name; }
                     trace.Add(value); if (trace.Count > 300) trace.RemoveAt(0); plot.Set(trace);
                 }
-                if (level.id == "P00") { if (training == null || training.step == 0) beforeObserved = true; else if (training.step > 0) afterObserved = true; }
+                if (level.id == "P00") { if (training == null || training.step == 0) beforeObserved = true; else if (training.step > 0) afterObserved = true; GuideOnObservation(e, args); }
                 SetStatus(gradients ? "模块读数现在显示回流梯度。对照仪表检查是否丢失贡献。" : "读数来自当前线路的实际计算。更换样本，观察相同设备的响应。"); Save();
             }
             catch (Exception e) { SetStatus("线路检查：" + e.Message); instrument.text = "信号未到达"; }
@@ -570,7 +597,7 @@ namespace LearningFoundry.Game
         {
             SetDebugOpen(true);
             if (running) { running = false; Save(); SetStatus("训练暂停。"); return; }
-            try { EnsureTraining(); if (training.step >= trainingBudget) trainingBudget += 120; running = true; SetStatus("CPU 正在执行你的计算图，每轮都会更新实际参数。"); }
+            try { EnsureTraining(); if (training.step >= trainingBudget) trainingBudget += 120; if (level.id == "P00") comparisonCaptured = false; trainingClock = 0; running = true; SetStatus("CPU 正在执行你的计算图，每轮都会更新实际参数。"); }
             catch (Exception e) { SetStatus(e.Message); }
         }
         void EnsureTraining()
@@ -579,12 +606,12 @@ namespace LearningFoundry.Game
             if (level.id == "P00" && !beforeObserved) throw new InvalidOperationException("先送入样本，保留训练前的结果。");
             if (level.id == "B09" && (!Missions.CheckRule(profile.addRule, false).passed || !Missions.CheckRule(profile.multiplyRule, true).passed || !Missions.CheckOptimizer(profile.optimizer).passed)) throw new InvalidOperationException("保存的反向规则或更新器不能通过检查，请回去修复。");
             training = new TrainingSession(graph, profile.modules, level.id == "P00" ? null : profile.Rules(), level.id == "P00" ? null : profile.optimizer, Missions.Samples(), level.id == "P00" ? null : profile.average);
-            training.learningRate = level.id == "P00" ? .2 : eta;
+            training.learningRate = eta;
             if (level.id == "B09") { training.phases = profile.phases; training.reverseOrder = profile.reverseOrder; training.accumulate = profile.accumulate; }
             trace.Clear(); trace.Add(training.loss); if (level.id == "P00") trainingBudget = 80;
         }
         void OneStep()
-        { running = false; try { EnsureTraining(); training.Tick(); trace.Add(training.loss); UpdateTrainingUI(); Save(); } catch (Exception e) { SetStatus(e.Message); } }
+        { running = false; try { EnsureTraining(); if (level.id == "P00") comparisonCaptured = false; training.Tick(); trace.Add(training.loss); UpdateTrainingUI(); Save(); } catch (Exception e) { SetStatus(e.Message); } }
         void UpdateTrainingUI()
         {
             SetDebugOpen(true);
@@ -606,7 +633,7 @@ namespace LearningFoundry.Game
                 }
                 switch (level.id)
                 {
-                    case "P00": result = new CheckResult { passed = beforeObserved && afterObserved && training != null && training.loss < .02, message = "需要观察同一机器训练前后，并送入训练后的样本。训练后平均损失应 < 0.02。" }; break;
+                    case "P00": result = new CheckResult { passed = beforeObserved && afterObserved && training != null && training.loss < .02 && (!GuideEnabled || comparisonCaptured), message = GuideEnabled ? "先按指引送回同一输入，比较训练前后的预测。训练后平均损失应 < 0.02。" : "需要观察同一机器训练前后，并送入训练后的样本。训练后平均损失应 < 0.02。" }; break;
                     case "B01": result = new CheckResult { passed = probeRecorded.Count >= 3, message = "需要在三个不同旋钮状态分别记录正确的局部变化率。" }; break;
                     case "B04": result = CheckGradients(false); break;
                     case "B05": result = CheckGradients(true); break;
@@ -625,7 +652,8 @@ namespace LearningFoundry.Game
                 if (!profile.completed.Contains(level.id)) profile.completed.Add(level.id); Save();
                 var next = campaign.levels.FirstOrDefault(l => Unlocked(l) && !profile.completed.Contains(l.id));
                 string text = "知识点：" + level.concept + "\n\n设备通过实际数值验收。\n解锁：" + level.reward;
-                if (level.id == "B09") text += "\n\n学习引擎已修复。后续将扩展到非线性网络、张量、卷积与手写数字分类。当前可玩切片到此结束。";
+                if (level.id == "P00") { ClearGuide(); text += "\n\n你刚体验了：看预测 → 训练 → 再比较。\n接下来从最小部件开始造机器。A01 只需把输入的右侧插孔接到输出的左侧插孔，让信号到达终点。"; }
+                if (level.id == "B09") text += "\n\n学习引擎已修复。接下来可以进入非线性网络、张量、卷积与手写数字分类的委托。";
                 Modal("维修完成 ✓", text, next == null ? "查看工坊路线" : "下一份委托 · " + next.id, () => { if (next == null) Map(); else OpenLevel(next.id); });
             }
             catch (Exception e) { SetStatus("验收停止：" + e.Message); }
@@ -724,7 +752,7 @@ namespace LearningFoundry.Game
         }
         void Controls()
         {
-            Modal("工作台操作手册", "零件：点托盘或数字键拿取，在空位左键安装。\n接线：点源模块右侧插孔，带着预览线点目标插孔。\n移动：拖动模块的实体面板。滚轮移动工作台，＋/− 缩放。\n调参：拖动实体旋钮；Shift 微调。点部件可输入精确值。\n拆线：选模块，点‘断开输入’。\n撤销 / 重做：Ctrl+Z / Ctrl+Y。Esc 取消接线并暂停。\n送入样本：读数来自当前线路；下一样本检查新输入。\n验收：运行多组数值规格，成功后解锁下一委托。\n工作台自动保存；训练可暂停、单步或继续。", "回到工作台", () => { });
+            Modal("工作台操作手册", "零件：点托盘或数字键拿取，在空位左键安装。\n接线：点源模块右侧插孔，带着预览线点目标插孔。\n画布：按住右键拖动，自由平移；滚轮滚动，＋/− 缩放。\n右键单击放下工具；持线或拿取部件时仍能右键拖动画布。\n部件：左键拖动实体面板；左键拖动旋钮调参，Shift 微调。\n拆线：选模块，点‘断开输入’。\n撤销 / 重做：Ctrl+Z / Ctrl+Y。Esc 取消接线并暂停。\n送入样本：读数来自当前线路；下一样本检查新输入。\n验收：运行多组数值规格，成功后解锁下一委托。\n工作台自动保存；训练可暂停、单步或继续。", "回到工作台", () => { });
         }
         void Settings()
         {
@@ -741,11 +769,8 @@ namespace LearningFoundry.Game
             for (int i = 0; i < args.Length - 1; i++) if (args[i] == "--capture-output") output = args[i + 1];
             if (output == null) output = Path.Combine(Application.persistentDataPath, "smoke"); Directory.CreateDirectory(output);
             yield return new WaitForSecondsRealtime(1);
-            yield return new WaitForEndOfFrame(); CaptureNative(Path.Combine(output, "01-main-menu.png"));
-            yield return new WaitForSecondsRealtime(.5f);
-            Map(); yield return new WaitForEndOfFrame(); CaptureNative(Path.Combine(output, "02-campaign.png"));
-            yield return new WaitForSecondsRealtime(.5f);
-            OpenLevel("P00"); Observe(); EnsureTraining(); for (int i = 0; i < 80; i++) training.Tick(); UpdateTrainingUI(); Observe(); Check();
+            bool onboardingGood = false;
+            yield return StartCoroutine(SmokeOnboarding(output, value => onboardingGood = value));
             bool tutorialFlow = profile.completed.Contains("P00");
             var nextJob = FindObjectsOfType<Button>().First(b => b.gameObject.name == "下一份委托 · A01"); nextJob.onClick.Invoke();
             yield return null;
@@ -786,6 +811,8 @@ namespace LearningFoundry.Game
             bool rotaryUndo = graph.nodes.FirstOrDefault(n => n.kind == NodeKind.Parameter)?.value == priorValue;
             inspector.gameObject.SetActive(false); yield return null;
             bool hiddenBoxHasNoShadow = !screen.Find("Portable Control Box Shadow").gameObject.activeSelf;
+            bool panningGood = false;
+            yield return StartCoroutine(SmokePanning(output, value => panningGood = value));
             // A diagnostic fixture is never loaded into a real player's save. It exercises the actual workshop and trainer.
             foreach (var id in Missions.Implemented.Take(16)) if (!profile.completed.Contains(id)) profile.completed.Add(id);
             profile.addRule = Recipes.Rule(false); profile.multiplyRule = Recipes.Rule(true); profile.optimizer = Recipes.Optimizer(); profile.reverseOrder = profile.accumulate = true; profile.phases = new[] { "forward", "clear", "backward", "update" };
@@ -802,6 +829,11 @@ namespace LearningFoundry.Game
             inspector.anchoredPosition = new Vector2(1246, -314); meterDock.anchoredPosition = new Vector2(366, -579);
             EnsureTraining(); for (int i = 0; i < 180; i++) { training.Tick(); trace.Add(training.loss); } UpdateTrainingUI();
             yield return new WaitForEndOfFrame(); CaptureNative(Path.Combine(output, "03-workshop.png"));
+            CaptureNative(Path.Combine(output, "16-pan-before.png"));
+            var panBefore = boardRoot.anchoredPosition;
+            SimulatePan(CanvasPoint(680, 430), CanvasPoint(462, 542)); yield return new WaitForEndOfFrame();
+            CaptureNative(Path.Combine(output, "17-pan-after.png"));
+            boardRoot.anchoredPosition = panBefore;
             string measured = instrument.text; Vector2 priorPosition = boardRoot.anchoredPosition;
             Select(graph.nodes.First(n => n.kind == NodeKind.Parameter)); yield return null;
             bool selectionKeepsReadout = instrument.text == measured;
@@ -813,7 +845,7 @@ namespace LearningFoundry.Game
             bool manualKeepsCanvas = boardRoot.anchoredPosition == priorPosition && instrument.text == measured;
             yield return new WaitForEndOfFrame(); CaptureNative(Path.Combine(output, "06-object-inspector.png"));
             yield return new WaitForSecondsRealtime(.5f);
-            bool good = takeBeforeInstall && overlapBlocked && cancelledWithoutMutation && installAtPointer && rotaryEditsRealParameter && rotaryUndo && hiddenBoxHasNoShadow && tutorialFlow && pinConnection && inlineFailure && selectionKeepsReadout && dockKeepsCanvas && manualKeepsCanvas && training.loss < .002 && Missions.Check("B09", graph, profile).passed;
+            bool good = panningGood && onboardingGood && takeBeforeInstall && overlapBlocked && cancelledWithoutMutation && installAtPointer && rotaryEditsRealParameter && rotaryUndo && hiddenBoxHasNoShadow && tutorialFlow && pinConnection && inlineFailure && selectionKeepsReadout && dockKeepsCanvas && manualKeepsCanvas && training.loss < .002 && Missions.Check("B09", graph, profile).passed;
             File.WriteAllText(Path.Combine(output, "player-smoke.json"), "{\"passed\":" + (good ? "true" : "false") + ",\"tutorialFlow\":" + (tutorialFlow ? "true" : "false") + ",\"pinConnection\":" + (pinConnection ? "true" : "false") + ",\"inlineFailure\":" + (inlineFailure ? "true" : "false") + ",\"selectionKeepsReadout\":" + (selectionKeepsReadout ? "true" : "false") + ",\"dockKeepsCanvas\":" + (dockKeepsCanvas ? "true" : "false") + ",\"manualKeepsCanvas\":" + (manualKeepsCanvas ? "true" : "false") + ",\"steps\":180,\"loss\":" + training.loss.ToString("R", CultureInfo.InvariantCulture) + ",\"ui\":\"Unity uGUI native player\"}");
             File.WriteAllText(Path.Combine(output, "interaction-smoke.json"), JsonUtility.ToJson(new InteractionReport {
                 passed = good, takeBeforeInstall = takeBeforeInstall, overlapBlocked = overlapBlocked, cancelledWithoutMutation = cancelledWithoutMutation,
